@@ -1,0 +1,37 @@
+{
+    "name": "kirschbaum-development/mutable-listeners",
+    "description": "A package for unregistering Listeners from Laravel Events!",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Justin Seliga",
+            "email": "justin@kirschbaumdevelopment.com"
+        },
+        {
+            "name": "Bogdan Cismariu",
+            "email": "bogdan@kirschbaumdevelopment.com"
+        }
+    ],
+    "require": {
+        "orchestra/testbench": "^6.3",
+        "nunomaduro/collision": "^5.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "KirschbaumDevelopment\\MutableListeners\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "KirschbaumDevelopment\\MutableListeners\\Providers\\ServiceProvider"
+            ]
+        }
+    }
+}
