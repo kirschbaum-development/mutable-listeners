@@ -19,52 +19,102 @@ class MuteListenerTest extends TestCase
         $this->registerListeners();
         Event::mute(Halloween::class, Tricks::class);
 
-        event(new Halloween());
+        event(new Halloween);
 
         $this->assertEquals(
             '🍭🍬',
             cache()->get(Treats::class)
         );
 
+        $this->assertEquals(
+            '👃🏼🦶🏼',
+            cache()->get(SmellyFeet::class)
+        );
+
+
         $this->assertEmpty(
             cache()->get(Tricks::class)
         );
     }
 
-    public function testMutableTrait()
+    public function testMutableTraitMute()
     {
         $this->registerListeners();
         Tricks::mute(Halloween::class);
 
-        event(new Halloween());
+        event(new Halloween);
 
         $this->assertEquals(
             '🍭🍬',
             cache()->get(Treats::class)
         );
 
+        $this->assertEquals(
+            '👃🏼🦶🏼',
+            cache()->get(SmellyFeet::class)
+        );
+
+
         $this->assertEmpty(
             cache()->get(Tricks::class)
         );
     }
 
-    /**
-     * Register the listener.
-     *
-     * @return void
-     */
+    public function testSoloMacroIsRegisteredOnEvent()
+    {
+        $this->assertTrue(
+            Event::hasMacro('solo')
+        );
+    }
+
+    public function testListenerCanBeSolo()
+    {
+        $this->registerListeners();
+        Event::solo(Halloween::class, Tricks::class);
+
+        event(new Halloween);
+
+        $this->assertEmpty(
+            cache()->get(Treats::class)
+        );
+
+        $this->assertEmpty(
+            cache()->get(SmellyFeet::class)
+        );
+
+
+        $this->assertEquals(
+            '👻🧙💀',
+            cache()->get(Tricks::class)
+        );
+    }
+
+    public function testMutableTraitSolo()
+    {
+        $this->registerListeners();
+        Tricks::solo(Halloween::class);
+
+        event(new Halloween);
+
+        $this->assertEmpty(
+            cache()->get(Treats::class)
+        );
+
+        $this->assertEmpty(
+            cache()->get(SmellyFeet::class)
+        );
+
+        $this->assertEquals(
+            '👻🧙💀',
+            cache()->get(Tricks::class)
+        );
+    }
+
     protected function registerListeners()
     {
-        Event::listen(Halloween::class, Treats::class);
         Event::listen(Halloween::class, Tricks::class);
-    }
-}
-
-class Treats
-{
-    public function handle(Halloween $event)
-    {
-        cache()->put(static::class, '🍭🍬');
+        Event::listen(Halloween::class, Treats::class);
+        Event::listen(Halloween::class, SmellyFeet::class);
     }
 }
 
@@ -72,9 +122,25 @@ class Tricks
 {
     use Mutable;
 
-    public function handle(Halloween $event)
+    public function handle()
     {
         cache()->put(static::class, '👻🧙💀');
+    }
+}
+
+class Treats
+{
+    public function handle()
+    {
+        cache()->put(static::class, '🍭🍬');
+    }
+}
+
+class SmellyFeet
+{
+    public function handle()
+    {
+        cache()->put(static::class, '👃🏼🦶🏼');
     }
 }
 
