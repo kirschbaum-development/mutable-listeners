@@ -3,7 +3,7 @@
 namespace KirschbaumDevelopment\MutableListeners;
 
 use Closure;
-use Opis\Closure\ReflectionClosure;
+use ReflectionFunction;
 
 class Mixin
 {
@@ -11,9 +11,13 @@ class Mixin
     {
         return function (string $event, string $listener) {
             collect(data_get($this->listeners, $event, []))->each(function ($closure, $index) use ($event, $listener) {
-                $reflection = new ReflectionClosure($closure);
-
-                $use = data_get($reflection->getUseVariables(), 'listener');
+                $use = match(gettype($closure)) {
+                    'string' => $listener,
+                    'object' => match(get_class($closure)) {
+                        Closure::class => data_get((new ReflectionFunction($closure))->getClosureUsedVariables(), 'listener'),
+                        default => null
+                    },
+                };
 
                 if ($use === null || $use instanceof Closure || $use !== $listener) {
                     return;
@@ -28,9 +32,13 @@ class Mixin
     {
         return function (string $event, string $listener) {
             collect(data_get($this->listeners, $event, []))->each(function ($closure, $index) use ($event, $listener) {
-                $reflection = new ReflectionClosure($closure);
-
-                $use = data_get($reflection->getUseVariables(), 'listener');
+                $use = match(gettype($closure)) {
+                    'string' => $listener,
+                    'object' => match(get_class($closure)) {
+                        Closure::class => data_get((new ReflectionFunction($closure))->getClosureUsedVariables(), 'listener'),
+                        default => null
+                    },
+                };
 
                 if ($use === null || $use instanceof Closure || $use === $listener) {
                     return;
